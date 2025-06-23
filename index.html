@@ -1,0 +1,225 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmileBright Dental Clinic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body class="font-poppins bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-600 text-white">
+    <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+      <div class="text-2xl font-bold">SmileBright Dental</div>
+      <nav class="space-x-6 hidden md:flex">
+        <a href="#home" class="hover:text-blue-200">Home</a>
+        <a href="#services" class="hover:text-blue-200">Services</a>
+        <a href="#about" class="hover:text-blue-200">About</a>
+        <a href="#contact" class="hover:text-blue-200">Contact</a>
+      </nav>
+      <button class="md:hidden" onclick="toggleMenu()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden bg-blue-700 text-white flex flex-col items-center space-y-4 py-4">
+      <a href="#home" class="hover:text-blue-200">Home</a>
+      <a href="#services" class="hover:text-blue-200">Services</a>
+      <a href="#about" class="hover:text-blue-200">About</a>
+      <a href="#contact" class="hover:text-blue-200">Contact</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="bg-cover bg-center h-[600px] flex items-center justify-center text-center text-white" style="background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1920');">
+    <div class="bg-black bg-opacity-50 p-10 rounded-lg">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to SmileBright Dental</h1>
+      <p class="text-lg md:text-xl mb-6">Your trusted partner for a healthy, beautiful smile.</p>
+      <a href="#contact" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold">Book Appointment</a>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-12">Our Services</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Service 1 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/the-surprising-health-benefits-of-regular-dental-cleanings.jpg" alt="Teeth Cleaning" class="w-full h-48 object-cover">
+          <div class="p-6">
+           <a href="teeth-cleaning.html"><h3 class="text-xl font-semibold mb-2">Teeth Cleaning</h3></a> 
+            <p class="text-gray-600">Professional cleaning to remove plaque and tartar, ensuring a fresh and healthy smile.</p>
+          </div>
+        </div>
+        <!-- Service 2 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/Untitled.jpeg" alt="Teeth Whitening" class="w-full h-48 object-cover">
+          <div class="p-6">
+           <a href="teeth-whitening.html"> <h3 class="text-xl font-semibold mb-2">Teeth Whitening</h3></a>
+            <p class="text-gray-600">Brighten your smile with our safe and effective whitening treatments.</p>
+          </div>
+        </div>
+        <!-- Service 3 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/dental implant.jpeg" alt="Dental Implants" class="w-full h-48 object-cover">
+          <div class="p-6">
+            <a href="dental-implants.html"><h3 class="text-xl font-semibold mb-2">Dental Implants</h3></a>
+            <p class="text-gray-600">Replace missing teeth with durable, natural-looking implants.</p>
+          </div>
+        </div>
+        <!-- Service 4 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/orthodontic.jpeg" alt="Orthodontics" class="w-full h-48 object-cover">
+          <div class="p-6">
+            <a href="orthodontics.html"><h3 class="text-xl font-semibold mb-2">Orthodontics</h3></a>
+            <p class="text-gray-600">Straighten your teeth with braces or clear aligners for a confident smile.</p>
+          </div>
+        </div>
+        <!-- Service 5 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/root canal.jpeg" alt="Root Canal" class="w-full h-48 object-cover">
+          <div class="p-6">
+           <a href="root-canal.html"> <h3 class="text-xl font-semibold mb-2">Root Canal Therapy</h3></a>
+            <p class="text-gray-600">Relieve pain and save your tooth with our expert root canal treatments.</p>
+          </div>
+        </div>
+        <!-- Service 6 -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="img/cosmetic.jpeg" alt="Cosmetic Dentistry" class="w-full h-48 object-cover">
+          <div class="p-6">
+           <a href="cosmetic-dentistry.html"> <h3 class="text-xl font-semibold mb-2">Cosmetic Dentistry</h3></a>
+            <p class="text-gray-600">Enhance your smile with veneers, bonding, and more.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="bg-gray-200 py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-12">About Us</h2>
+      <div class="flex flex-col md:flex-row items-center">
+        <img src="https://images.unsplash.com/photo-1629909615122-4e0e81916a9b?auto=format&fit=crop&w=600" alt="Dental Team" class="w-full md:w-1/2 rounded-lg mb-6 md:mb-0 md:mr-8">
+        <div class="md:w-1/2">
+          <p class="text-gray-600 mb-4">At SmileBright Dental, we are dedicated to providing top-quality dental care in a comfortable and welcoming environment. Our experienced team uses the latest technology to ensure your visit is as pleasant as possible.</p>
+          <p class="text-gray-600">With years of expertise, we offer a wide range of services to meet your dental needs, from routine cleanings to advanced cosmetic procedures. Your smile is our priority!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-12">Contact Us</h2>
+      <div class="flex flex-col md:flex-row gap-8">
+        <!-- Contact Info -->
+        <div class="md:w-1/2">
+          <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
+          <p class="text-gray-600 mb-2"><strong>Address:</strong> 123 Smile St, Dental City, DC 12345</p>
+          <p class="text-gray-600 mb-2"><strong>Phone:</strong> (123) 456-7890</p>
+          <p class="text-gray-600 mb-2"><strong>Email:</strong> info@smilebrightdental.com</p>
+          <p class="text-gray-600"><strong>Hours:</strong> Mon-Fri 9AM-5PM, Sat 9AM-2PM</p>
+        </div>
+        <!-- Contact Form -->
+        <div class="md:w-1/2">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-xl font-semibold mb-4">Book an Appointment</h3>
+            <div>
+              <div class="mb-4">
+                <label for="name" class="block text-gray-600 mb-1">Name</label>
+                <input type="text" id="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+              </div>
+              <div class="mb-4">
+                <label for="email" class="block text-gray-600 mb-1">Email</label>
+                <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+              </div>
+              <div class="mb-4">
+                <label for="message" class="block text-gray-600 mb-1">Message</label>
+                <textarea id="message" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" rows="4" required></textarea>
+              </div>
+              <button onclick="submitForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold w-full">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-blue-600 text-white py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 SmileBright Dental. All rights reserved.</p>
+      <div class="mt-4 space-x-4">
+        <a href="#" class="hover:text-blue-200">Privacy Policy</a>
+        <a href="#" class="hover:text-blue-200">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function submitForm() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      if (name && email && message) {
+        alert('Thank you for your message! We will get back to you soon.');
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('message').value = '';
+      } else {
+        alert('Please fill out all fields.');
+      }
+    }
+  </script>
+</body>
+</html>
